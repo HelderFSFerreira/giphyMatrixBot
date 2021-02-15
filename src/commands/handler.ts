@@ -1,10 +1,9 @@
 import { LogService, MatrixClient, MessageEvent, RichReply, UserID } from "matrix-bot-sdk";
-import { runHelloCommand } from "./hello";
-import * as htmlEscape from "escape-html";
+import { GiphyWidget } from "./widget";
 
 // The prefix required to trigger the bot. The bot will also respond
 // to being pinged directly.
-export const COMMAND_PREFIX = "!bot";
+export const COMMAND_PREFIX = "!giphy";
 
 // This is where all of our commands will be handled
 export default class CommandHandler {
@@ -54,21 +53,14 @@ export default class CommandHandler {
         // Check to see what the arguments were to the command
         const args = event.textBody.substring(prefixUsed.length).trim().split(' ');
 
-        // Try and figure out what command the user ran, defaulting to help
+        // Command handle
         try {
-            if (args[0] === "hello") {
-                return runHelloCommand(roomId, event, args, this.client);
-            } else {
-                const help = "" +
-                    "!bot hello [user]     - Say hello to a user.\n" +
-                    "!bot help             - This menu\n";
 
-                const text = `Help menu:\n${help}`;
-                const html = `<b>Help menu:</b><br /><pre><code>${htmlEscape(help)}</code></pre>`;
-                const reply = RichReply.createFor(roomId, ev, text, html); // Note that we're using the raw event, not the parsed one!
-                reply["msgtype"] = "m.notice"; // Bots should always use notices
-                return this.client.sendMessage(roomId, reply);
-            }
+            const formWidget = await GiphyWidget.getWidget(this.client, args);
+            const layoutWidget = await GiphyWidget.getLayout(formWidget);
+            await this.client.sendStateEvent(roomId, formWidget.type, formWidget.state_key, formWidget.content);
+            await this.client.sendStateEvent(roomId, layoutWidget.type, layoutWidget.state_key, layoutWidget.content);
+
         } catch (e) {
             // Log the error
             LogService.error("CommandHandler", e);

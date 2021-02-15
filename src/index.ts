@@ -2,7 +2,7 @@ import {
     AutojoinRoomsMixin,
     LogLevel,
     LogService,
-    MatrixClient,
+    PantalaimonClient,
     RichConsoleLogger,
     SimpleFsStorageProvider
 } from "matrix-bot-sdk";
@@ -22,20 +22,25 @@ LogService.info("index", "Bot starting...");
 // Prepare the storage system for the bot
 const storage = new SimpleFsStorageProvider(path.join(config.dataPath, "bot.json"));
 
-// Create the client
-const client = new MatrixClient(config.homeserverUrl, config.accessToken, storage);
-
-// Setup the autojoin mixin (if enabled)
-if (config.autoJoin) {
-    AutojoinRoomsMixin.setupOnClient(client);
-}
-
-// Prepare the command handler
-const commands = new CommandHandler(client);
-
 // This is the startup closure where we give ourselves an async context
 (async function () {
+    
+    const pantalaimon = new PantalaimonClient(config.homeserverUrl, storage);
+    const client = await pantalaimon.createClientWithCredentials(config.username, config.password);
+
+    // Setup the autojoin mixin (if enabled)
+    if (config.autoJoin) {
+        AutojoinRoomsMixin.setupOnClient(client);
+    }
+
+    // Prepare the command handler
+    const commands = new CommandHandler(client);
+
     await commands.start();
     LogService.info("index", "Starting sync...");
     await client.start(); // This blocks until the bot is killed
 })();
+
+
+// docker run -it --rm -v docker run -it --rm -v /path/to/pantalaimon/dir:/data -p 8008:8008 pantalaimon:/data -p 8008:8008 matrixdotorg/pantalaimon
+// docker run -it --rm -v /Users/h.ferreira/Documents/projects/learning/pantalaimon/volume:/data -p 8008:8008 matrixdotorg/pantalaimon
