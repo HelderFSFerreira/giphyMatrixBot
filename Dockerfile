@@ -10,7 +10,7 @@ RUN npm ci
 COPY . .
 
 # Build
-RUN npm build
+RUN npm run build
 
 #Execute
 VOLUME ["/app/config"]
