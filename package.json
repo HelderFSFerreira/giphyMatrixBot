@@ -28,7 +28,7 @@
     "escape-html": "^1.0.3",
     "js-yaml": "^4.1.0",
     "matrix-bot-sdk": "^0.5.18",
-    "matrix-widget-api": "0.1.0-beta.13"
+    "matrix-widget-api": "0.1.0-beta.18"
   },
   "devDependencies": {
     "@types/node": "^15.3.0",
