@@ -24,7 +24,7 @@
     "start:dev": "npm run build && node lib/index.js"
   },
   "dependencies": {
-    "config": "^3.3.6",
+    "config": "^4.0.0",
     "escape-html": "^1.0.3",
     "js-yaml": "^4.1.0",
     "matrix-bot-sdk": "^0.8.0",
